@@ -2,11 +2,12 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maestro of Fate - DCG Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maestro of Fate - Modern Edition</title>
     <style>
+        /* ナギソDCGベースのダークモダン背景と基本設定 */
         :root { 
-            --gold: #ffc107; 
+            --gold: #ffc107;
             --bg: #1e1e24; 
             --app-bg: #2c2c35;
             --card-bg: #3e3e4a; 
@@ -17,28 +18,37 @@
             font-family: sans-serif;
             background-color: var(--bg); 
             margin: 0; display: flex; justify-content: center; align-items: center; 
-            height: 100vh; overflow: hidden; color: var(--text);
+            min-height: 100vh; overflow: hidden; color: var(--text);
         }
 
         #app {
-            width: 100vw; height: 100dvh; background: var(--app-bg); 
+            width: 100vw;
+            height: 100dvh; background: var(--app-bg); 
             padding: 2vh 2vw; box-sizing: border-box; 
             display: flex; flex-direction: column; position: relative; 
-            overflow: hidden; font-size: clamp(12px, 1.2vw, 18px);
+            overflow: hidden;
+            font-size: clamp(12px, 1.2vw, 18px);
         }
 
         /* 画面切り替え用 */
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
         .active { display: flex !important; }
 
-        /* レイアウト（バトル＆エディタ） */
+        /* PC横画面対応のグリッドレイアウト */
         .two-pane {
-            display: grid; grid-template-columns: 2fr 1fr; gap: 2vh; height: 96vh;
+            display: grid;
+            grid-template-columns: 2fr 1fr; gap: 2vh; height: 96vh; align-items: stretch;
+        }
+        .two-pane > div:first-child {
+            display: flex; flex-direction: column; justify-content: space-between; height: 100%; overflow: hidden;
         }
         @media (max-width: 768px) { .two-pane { grid-template-columns: 1fr; overflow-y: auto; } }
 
         /* --- タイトル画面 --- */
-        .title-screen { overflow-y: auto; padding-right: 10px; padding-bottom: 30px; }
+        .title-screen { overflow-y: auto; overflow-x: hidden; padding-right: 10px; padding-bottom: 30px; height: 100%; }
+        .title-screen::-webkit-scrollbar { width: 8px; }
+        .title-screen::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+        
         .slot-list { 
             display: flex; flex-direction: column; gap: 6px; background: #3a3528; 
             border: 1px solid var(--gold); padding: 10px; border-radius: 10px; 
@@ -81,23 +91,30 @@
 
         .log-box {
             background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 8px;
-            border: 1px solid #444; overflow-y: auto; flex-grow: 1; max-height: 250px; font-size: 13px; color: #ddd; line-height: 1.5;
+            border: 1px solid #444; overflow-y: auto; height: 300px; min-height: 300px; font-size: 13px; color: #ddd; line-height: 1.5;
         }
+        .log-list { list-style: none; padding: 0; margin: 0; }
+        .log-list li { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 4px 0; }
 
         /* --- デッキ編集 --- */
         .card-pool-list { 
             display: flex; flex-wrap: wrap; gap: 12px; overflow-y: auto; padding: 15px 10px; 
-            border: 1px dashed #444; background: rgba(0, 0, 0, 0.2); border-radius: 8px; max-height: 60vh; align-content: flex-start;
+            border: 1px dashed #444; background: rgba(0, 0, 0, 0.2); border-radius: 8px;
+            max-height: 50vh; align-content: flex-start;
         }
+        .card-pool-list::-webkit-scrollbar { width: 8px; }
+        .card-pool-list::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+
         .stacked-item {
             display: flex; justify-content: space-between; align-items: center; 
             background: var(--card-bg); padding: 10px 15px; border-radius: 6px; 
             border: 1px solid #555; cursor: pointer; user-select: none; margin-bottom: 5px;
+            transition: background 0.2s;
         }
         .stacked-item:hover { background: #dc3545; border-color: #ff4d4d; }
         .stacked-item:hover::after { content: "外す"; color: white; font-weight: bold; position: absolute; right: 60px;}
 
-        /* --- カード --- */
+        /* --- カード (ナギソDCGスタイル) --- */
         .card { 
             flex-shrink: 0; width: 14vw; min-width: 110px; max-width: 140px; height: 32vh; min-height: 180px; 
             border-radius: 12px; color: white; padding: 10px; box-sizing: border-box; 
@@ -106,10 +123,14 @@
             border: 2px solid #555; box-shadow: 0 6px 12px rgba(0,0,0,0.4); position: relative; overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-        .card:hover { border-color: #007bff; transform: translateY(-5px); }
+        .card.playable {
+            border-color: #007bff;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.8), 0 6px 12px rgba(0,0,0,0.4); 
+            transform: translateY(-5px);
+        }
         .card.selected { 
-            border-color: var(--gold); box-shadow: 0 0 20px rgba(255, 193, 7, 0.9);
-            transform: translateY(-10px); background: #4a3e2b;
+            border-color: var(--gold) !important; box-shadow: 0 0 20px rgba(255, 193, 7, 0.9) !important;
+            transform: translateY(-10px) !important; background: #4a3e2b;
         }
         .card .cost { 
             position: absolute; top: 5px; left: 5px; background: #007bff; 
@@ -119,31 +140,93 @@
         .card .note { position: absolute; top: 5px; right: 5px; color: var(--gold); font-weight: bold; font-size: 14px; }
         .card .name { 
             margin-top: 25px; font-weight: bold; font-size: clamp(11px, 1.2vw, 15px); 
-            border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 4px; width: 100%; 
+            border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 4px; width: 100%;
         }
-        .card .effect { margin-top: 10px; font-size: 12px; color: var(--gold); font-weight: bold; }
+        .card .effect { margin-top: 10px; font-size: 12px; color: var(--gold); font-weight: bold; line-height: 1.3; }
         .card-count { color: #fff; margin-top: auto; font-size: 12px; }
 
         /* --- バトルエリア --- */
         .hand-container { 
-            display: flex; gap: 1vw; overflow-x: auto; padding: 15px 10px; 
-            background: rgba(0,0,0,0.3); border-radius: 8px; min-height: 220px;
+            display: flex; gap: 1vw; overflow-x: auto; overflow-y: hidden; padding: 1.5vh 1vw; 
+            background: rgba(0,0,0,0.3); border-radius: 8px; height: 35vh; min-height: 220px;
+            width: 100%; box-sizing: border-box; align-items: center; white-space: nowrap; flex-shrink: 0;
         }
+        .hand-container::-webkit-scrollbar { height: 10px; }
+        .hand-container::-webkit-scrollbar-thumb { background: #555; border-radius: 5px; }
+
         .synth-area { 
             border: 1px dashed #444; min-height: 140px; margin-bottom: 10px; 
             display: flex; gap: 10px; padding: 10px; align-items: center; background: rgba(0, 0, 0, 0.2); border-radius: 8px;
         }
+
+        /* --- 辞典モーダル --- */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.92); color: white; display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100; box-sizing: border-box; padding: 5vh 5vw;
+        }
+        .overlay.active { display: flex; }
+        .dict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) { .dict-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
 <div id="app">
     
+    <div id="dict-modal" class="overlay">
+        <h2 style="color: var(--gold); margin-bottom: 20px;">📖 音楽理論＆コードレシピ辞典</h2>
+        <div style="background: #232730; padding: 20px; border-radius: 10px; border: 1px solid #555; width: 100%; max-width: 800px; max-height: 70vh; overflow-y: auto; font-size: 14px;">
+            
+            <h3 style="color: #007bff; border-bottom: 1px solid #444; padding-bottom: 5px;">🎵 基礎知識 (12平均律)</h3>
+            <p style="color: #ccc; line-height: 1.5; margin-bottom: 15px;">
+                この世界では、音階は「C, Cis, D, Dis, E, F, Fis, G, Gis, A, B, H」の12半音で構成されています。特定の音程（インターバル）を組み合わせることで強力な和音（コード）を合成できます。
+            </p>
+
+            <h3 style="color: #28a745; border-bottom: 1px solid #444; padding-bottom: 5px;">🎹 合成レシピ (和音)</h3>
+            <div class="dict-grid">
+                <div style="background: #151518; padding: 12px; border-radius: 6px; border-left: 4px solid var(--gold);">
+                    <div style="font-weight: bold; color: #fff; margin-bottom: 5px;">【メジャーコード (Major)】</div>
+                    <div style="color: #ccc; font-size: 13px; line-height: 1.4;">
+                        構成音: 基準音 + 半音4つ上 + 半音7つ上<br>
+                        効果: コスト0。相手に<strong>15ダメージ</strong>を与える。
+                    </div>
+                </div>
+                <div style="background: #151518; padding: 12px; border-radius: 6px; border-left: 4px solid var(--gold);">
+                    <div style="font-weight: bold; color: #fff; margin-bottom: 5px;">【マイナーコード (minor)】</div>
+                    <div style="color: #ccc; font-size: 13px; line-height: 1.4;">
+                        構成音: 基準音 + 半音3つ上 + 半音7つ上<br>
+                        効果: コスト0。相手に<strong>15ダメージ</strong>を与える。
+                    </div>
+                </div>
+                <div style="background: #151518; padding: 12px; border-radius: 6px; border-left: 4px solid var(--gold);">
+                    <div style="font-weight: bold; color: #fff; margin-bottom: 5px;">【セブンスコード (7th)】</div>
+                    <div style="color: #ccc; font-size: 13px; line-height: 1.4;">
+                        構成音: 基準音 + 4つ上(または3つ) + 7つ上 + <strong>半音10つ上</strong>（4枚合成）<br>
+                        効果: コスト0。相手に<strong>15ダメージ</strong>を与える。
+                    </div>
+                </div>
+            </div>
+            
+            <h3 style="color: #dc3545; border-bottom: 1px solid #444; padding-bottom: 5px; margin-top: 20px;">🛡️ クラス特性</h3>
+            <ul style="color: #ccc; font-size: 13px; line-height: 1.6;">
+                <li><strong>March (アグロ型):</strong> 1つ前に使ったカードよりコストが高いとダメージ+1</li>
+                <li><strong>Requiem (コントロール型):</strong> 自分の墓地5枚につきダメージ+1</li>
+                <li><strong>Caprice (コンボ型):</strong> ターン内に3枚以上プレイするとドロー枚数+1</li>
+            </ul>
+        </div>
+        <button class="action-btn" style="margin-top: 25px; background: #6c757d; width: 200px;" onclick="toggleDict()">❌ 閉じる</button>
+    </div>
+
     <div id="screen-title" class="screen active">
         <div class="title-screen">
-            <h1 style="text-align:center; color: var(--gold);">Maestro of Fate</h1>
+            <h1 style="text-align:center; color: var(--gold); margin-top: 20px;">Maestro of Fate</h1>
             <p style="text-align:center; color:gray;">30枚のデッキとクラスを選択して戦う和音合成カードゲーム</p>
             
+            <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+                <button class="edit-btn" style="background: #17a2b8;" onclick="toggleDict()">📖 音楽理論＆コード辞典を開く</button>
+            </div>
+
             <h3 style="color: var(--gold);">✨ デッキスロット (最大10種類)</h3>
             <div class="slot-list" id="deck-slots"></div>
 
@@ -151,9 +234,9 @@
                 <h3 style="margin-top:0;">⚔️ バトル設定</h3>
                 <label style="font-size: 12px; font-weight: bold; color: #a9b0b7;">リーダーのクラスを選択</label>
                 <select id="class-select" class="class-select">
-                    <option value="March">March (アグロ型) - 1つ前に使ったカードよりコストが高いとダメージ+1</option>
-                    <option value="Requiem">Requiem (コントロール型) - 自分の墓地5枚につきダメージ+1</option>
-                    <option value="Caprice">Caprice (コンボ型) - ターン内に3枚以上プレイするとドロー枚数+1</option>
+                    <option value="March">March (アグロ型) - コスト上昇でダメージ+1</option>
+                    <option value="Requiem">Requiem (コントロール型) - 墓地5枚につきダメージ+1</option>
+                    <option value="Caprice">Caprice (コンボ型) - ターン3枚以上でドロー+1</option>
                 </select>
                 <button class="action-btn" id="btn-start" onclick="startGame()" disabled>🤖 選択したデッキでCPUと対戦</button>
             </div>
@@ -171,7 +254,8 @@
             <div style="display: flex; flex-direction: column;">
                 <p style="font-weight: bold; margin: 10px 0 5px 0; font-size: 16px; text-align: center;" id="deck-count-display"></p>
                 <button class="action-btn" id="btn-save" onclick="saveDeck()">💾 デッキを保存して戻る</button>
-                <button class="action-btn" style="background:#6c757d;" onclick="closeEditor()">❌ 変更を破棄して戻る</button>
+                <button class="action-btn" style="background:#6c757d; margin-bottom: 15px;" onclick="closeEditor()">❌ 変更を破棄して戻る</button>
+                <button class="edit-btn" style="background: #17a2b8; width: 100%; margin-bottom: 10px;" onclick="toggleDict()">📖 音楽理論＆コード辞典を開く</button>
                 
                 <h3>🃏 現在の編成 (クリックで1枚外す)</h3>
                 <div style="display: flex; flex-direction: column; gap: 6px; overflow-y: auto; max-height: 60vh; padding-right: 5px;" id="deck-stacked-view"></div>
@@ -181,21 +265,25 @@
 
     <div id="screen-battle" class="screen">
         <div class="two-pane">
-            <div style="display: flex; flex-direction: column;">
+            <div style="display: flex; flex-direction: column; flex-grow: 1;">
                 <div class="status-box">
                     <h3>🤖 CPU HP: <strong id="cpu-hp">30</strong> (マナ: <span id="cpu-mana">1</span>)</h3>
                     <p>手札: <span id="cpu-hand">3</span>枚 / 山札: <span id="cpu-deck">27</span>枚</p>
                 </div>
+             
                 <div class="status-box" style="border-color: var(--gold);">
                     <h3>👤 あなた HP: <strong id="player-hp">30</strong> (マナ: <span id="player-mana">1</span>/<span id="player-max">1</span>)</h3>
-                    <p>クラス: <span id="player-class-disp"></span> / 墓地: <span id="player-grave">0</span>枚</p>
+                    <p>クラス: <span id="player-class-disp" style="color:var(--gold); font-weight:bold;"></span> / 墓地: <span id="player-grave">0</span>枚</p>
                 </div>
                 
-                <div class="log-box" id="battle-log"></div>
+                <div class="log-box" id="battle-log">
+                    <ul class="log-list" id="log-list"></ul>
+                </div>
             </div>
 
             <div style="display: flex; flex-direction: column;">
-                <button class="action-btn" style="background:#dc3545; margin-bottom:5px;" onclick="game.endTurn()">ターン終了</button>
+                <button class="edit-btn" style="background: #17a2b8; margin-bottom: 10px;" onclick="toggleDict()">📖 音楽理論辞典</button>
+                <button class="action-btn" style="background:#dc3545; margin-bottom:10px;" id="end-turn-btn" onclick="game.endTurn()">ターン終了</button>
                 
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h3 style="margin: 0;">🎹 合成エリア (最大4枚選択)</h3>
@@ -216,7 +304,6 @@
 const NOTES = ["C", "Cis", "D", "Dis", "E", "F", "Fis", "G", "Gis", "A", "B", "H"];
 const NOTE_MAP = {"C":0, "Cis":1, "Des":1, "D":2, "Dis":3, "Es":3, "E":4, "F":5, "Fis":6, "Ges":6, "G":7, "Gis":8, "As":8, "A":9, "B":10, "H":11};
 
-// テキストを明確化
 const CARD_POOL = [
     { name: "Grandioso", note: "C", cost: 1, val: 2, type: "dmg", desc: "相手に2ダメージを与える。" },
     { name: "Maestoso", note: "E", cost: 2, val: 5, type: "dmg", desc: "相手に5ダメージを与える。" },
@@ -235,12 +322,18 @@ const CARD_POOL = [
 // --- 状態管理 ---
 let customDecks = JSON.parse(localStorage.getItem("mof_decks")) || Array(10).fill(null);
 let currentSlot = 0;
-let editingDeck = []; 
+let editingDeck = [];
 let selectedDeckSlot = -1;
+
+// --- 辞典モーダル ---
+function toggleDict() {
+    const modal = document.getElementById('dict-modal');
+    modal.classList.toggle('active');
+}
 
 // --- 画面切り替え ---
 function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.screen:not(.overlay)').forEach(el => el.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
 
@@ -256,7 +349,7 @@ function renderTitle() {
         let div = document.createElement('div');
         div.className = 'slot-item';
         div.innerHTML = `
-            <button class="slot-btn" onclick="selectDeck(${i})" ${isComplete ? '' : 'disabled'}>
+            <button class="slot-btn" onclick="selectDeck(${i})" ${isComplete ? '' : 'disabled'} style="${i === selectedDeckSlot ? 'border-color: #28a745; background: rgba(40, 167, 69, 0.2);' : ''}">
                 🎴 デッキスロット ${i+1} ${btnStatus}
             </button>
             <button class="edit-btn" onclick="openEditor(${i})">🛠️ 編集</button>
@@ -269,7 +362,7 @@ function selectDeck(slot) {
     selectedDeckSlot = slot;
     document.getElementById('btn-start').disabled = false;
     document.getElementById('btn-start').innerText = `🤖 スロット${slot+1}でCPUと対戦開始`;
-    renderTitle(); // 再描画して選択状態の色を変えたい場合はここでCSS制御
+    renderTitle();
 }
 
 // --- エディタ処理 ---
@@ -293,12 +386,12 @@ function saveDeck() {
 }
 
 function updateEditor() {
-    // プール描画
     const pool = document.getElementById('pool-grid');
     pool.innerHTML = CARD_POOL.map((c, idx) => {
         let count = editingDeck.filter(name => name === c.name).length;
+        let isPlayable = count < 3;
         return `
-        <div class="card" onclick="addCard('${c.name}')">
+        <div class="card ${isPlayable ? 'playable' : ''}" onclick="addCard('${c.name}')" style="${!isPlayable ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
             <div class="cost">${c.cost}</div>
             <div class="note">${c.note}</div>
             <div class="name">${c.name}</div>
@@ -308,20 +401,27 @@ function updateEditor() {
         `;
     }).join('');
 
-    // スタックビュー描画
     const stack = document.getElementById('deck-stacked-view');
     let counts = {};
     editingDeck.forEach(name => { counts[name] = (counts[name]||0)+1; });
     
-    stack.innerHTML = Object.keys(counts).map(name => {
+    // コスト順ソート
+    let sortedKeys = Object.keys(counts).sort((a,b) => {
+        return CARD_POOL.find(c=>c.name===a).cost - CARD_POOL.find(c=>c.name===b).cost;
+    });
+
+    stack.innerHTML = sortedKeys.map(name => {
         let c = CARD_POOL.find(card => card.name === name);
         return `
         <div class="stacked-item" onclick="removeCard('${name}')">
             <div style="display:flex; align-items:center; gap:10px;">
                 <span style="background:#007bff; color:white; border-radius:50%; width:24px; height:24px; display:inline-flex; justify-content:center; align-items:center; font-size:12px; font-weight:bold;">${c.cost}</span>
-                <span style="font-weight:bold;">${name}</span>
+                <span style="font-weight:bold; font-size: 1.2vw;">${name}</span>
             </div>
-            <span style="background:var(--gold); color:#000; font-weight:bold; padding:2px 8px; border-radius:4px; font-size:13px;">${counts[name]} 枚</span>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <span style="font-size: 11px; color: #aaa;">(音:${c.note})</span>
+                <span style="background:var(--gold); color:#000; font-weight:bold; padding:2px 8px; border-radius:4px; font-size:13px;">${counts[name]} 枚</span>
+            </div>
         </div>
         `;
     }).join('');
@@ -355,13 +455,11 @@ function startGame() {
     let pClass = document.getElementById('class-select').value;
     document.getElementById('player-class-disp').innerText = pClass;
     
-    // 実体化
     let deckNames = customDecks[selectedDeckSlot];
     let pDeck = deckNames.map(name => {
         let base = CARD_POOL.find(c => c.name === name);
         return {...base, id: Math.random()};
     });
-
     game.init(pDeck, pClass);
     showScreen('screen-battle');
 }
@@ -370,15 +468,15 @@ const game = {
     p_hp: 30, c_hp: 30, p_mana: 1, p_max: 1, p_hand: [], p_deck: [],
     c_mana: 1, c_hand: [], c_deck: [], c_hand_len: 0, c_deck_len: 30,
     p_grave: 0, last_cost: 0, cards_played_this_turn: 0,
-    p_selected: [], has_synthsized: false, p_class: "",
+    p_selected: [], has_synthsized: false, p_class: "", is_player_turn: true,
 
     init(deck, pClass) {
         this.p_hp = 30; this.c_hp = 30; this.p_mana = 1; this.p_max = 1; this.c_mana = 1;
         this.p_grave = 0; this.last_cost = 0; this.cards_played_this_turn = 0;
         this.p_hand = []; this.c_hand = []; this.p_selected = [];
-        this.has_synthsized = false; this.p_class = pClass;
+        this.has_synthsized = false; this.p_class = pClass; this.is_player_turn = true;
         
-        document.getElementById('battle-log').innerHTML = '';
+        document.getElementById('log-list').innerHTML = '';
 
         this.p_deck = deck.sort(() => Math.random() - 0.5);
         this.c_deck = Array(30).fill(0).map(() => ({...CARD_POOL[Math.floor(Math.random()*CARD_POOL.length)], id: Math.random()}));
@@ -390,25 +488,39 @@ const game = {
     },
 
     log(m) {
-        const l = document.getElementById('battle-log');
-        l.innerHTML += `<div>${m}</div><hr style="border-top:1px solid #444; margin:4px 0;">`;
-        l.scrollTop = l.scrollHeight;
+        const ul = document.getElementById('log-list');
+        ul.innerHTML += `<li>${m}</li>`;
+        const box = document.getElementById('battle-log');
+        box.scrollTop = box.scrollHeight;
     },
 
     draw(who, num = 1) {
         for(let i=0; i<num; i++) {
             if(who === 'player') {
-                if(this.p_deck.length > 0) this.p_hand.push(this.p_deck.pop());
+                if(this.p_deck.length > 0) {
+                    if (this.p_hand.length < 10) this.p_hand.push(this.p_deck.pop());
+                    else this.log(`🔥 手札が上限(10枚)を超えているため、カードが燃破した！`);
+                } else {
+                    this.log(`💀 【LO】山札が0枚のため敗北しました。`);
+                    this.p_hp = 0; this.checkWinLose(); return;
+                }
             } else {
                 if(this.c_deck.length > 0) {
-                    this.c_hand.push(this.c_deck.pop());
-                    this.c_hand_len++; this.c_deck_len--;
+                    if (this.c_hand.length < 10) {
+                        this.c_hand.push(this.c_deck.pop());
+                        this.c_hand_len++;
+                    }
+                    this.c_deck_len--;
+                } else {
+                    this.log(`💀 【LO】相手の山札が0枚のため勝利しました。`);
+                    this.c_hp = 0; this.checkWinLose(); return;
                 }
             }
         }
     },
 
     play(idx) {
+        if (!this.is_player_turn) return;
         let c = this.p_hand[idx];
         if (this.p_mana < c.cost) return this.log("⚠️ マナが足りません。");
         
@@ -423,23 +535,27 @@ const game = {
 
     executeEffect(who, c) {
         let power = c.val;
-        
         // クラス能力
         if(who === 'player') {
             if(this.p_class === "March" && c.cost > this.last_cost) {
                 power += 1;
-                if(c.type === 'dmg') this.log(` ✨ [March] コスト上昇ボーナス！ダメージ+1`);
+                if(c.type === 'dmg') this.log(`  └ ✨ [March] コスト上昇ボーナス！ダメージ+1`);
             }
             if(this.p_class === "Requiem" && c.type === 'dmg') {
                 let bonus = Math.floor(this.p_grave / 5);
                 power += bonus;
-                if(bonus > 0) this.log(` ✨ [Requiem] 墓地ボーナス！ダメージ+${bonus}`);
+                if(bonus > 0) this.log(`  └ ✨ [Requiem] 墓地ボーナス！ダメージ+${bonus}`);
             }
             if(this.p_class === "Caprice" && c.type === 'draw' && this.cards_played_this_turn >= 3) {
                 power += 1;
-                this.log(` ✨ [Caprice] コンボボーナス！ドロー枚数+1`);
+                this.log(`  └ ✨ [Caprice] コンボボーナス！ドロー枚数+1`);
             }
         }
+
+        let actor = who === 'player' ? '👤 あなた' : '🤖 CPU';
+        let actionDesc = c.type === 'dmg' ? `相手に ${power} ダメージ！` : (c.type === 'heal' ? `HPを ${power} 回復！` : `カードを ${power} 枚引いた！`);
+        this.log(`${actor} が【${c.name}】を発動！`);
+        this.log(`  └ ${actionDesc}`);
 
         if(c.type === 'dmg') {
             who === 'player' ? this.c_hp -= power : this.p_hp -= power;
@@ -449,37 +565,44 @@ const game = {
         }
         if(c.type === 'draw') {
             if(c.name === "Misterioso" && who === 'player') {
-                // 特殊処理
                 for(let i=0; i<power; i++) {
                     let randCard = {...CARD_POOL[Math.floor(Math.random()*CARD_POOL.length)], id: Math.random()};
-                    this.p_hand.push(randCard);
+                    if (this.p_hand.length < 10) this.p_hand.push(randCard);
                 }
             } else {
                 this.draw(who, power);
             }
         }
         
-        let actor = who === 'player' ? '👤 あなた' : '🤖 CPU';
-        let actionDesc = c.type === 'dmg' ? `相手に ${power} ダメージ！` : (c.type === 'heal' ? `HPを ${power} 回復！` : `カードを ${power} 枚引いた！`);
-        this.log(`${actor} は【${c.name}】を発動： ${actionDesc}`);
-        
         this.last_cost = c.cost;
-        
-        if(this.c_hp <= 0) { alert("🎉 You Win!"); showScreen('screen-title'); }
-        if(this.p_hp <= 0) { alert("💀 Game Over..."); showScreen('screen-title'); }
+        this.checkWinLose();
+    },
+
+    checkWinLose() {
+        if(this.c_hp <= 0 && this.p_hp > 0) { alert("🎉 You Win!"); showScreen('screen-title'); }
+        else if(this.p_hp <= 0 && this.c_hp > 0) { alert("💀 Game Over..."); showScreen('screen-title'); }
+        else if(this.p_hp <= 0 && this.c_hp <= 0) { alert("🤝 Draw!"); showScreen('screen-title'); }
     },
 
     synthesize() {
+        if (!this.is_player_turn) return;
         if(this.p_selected.length < 3) return this.log("⚠️ 合成には3枚以上選択してください。");
         if(this.has_synthsized) return this.log("⚠️ 合成は1ターンに1回までです。");
 
         let notes = this.p_selected.map(i => this.p_hand[i].note);
         let chord = this.detectChord(notes);
+        
         if(chord) {
             this.log(`🎹 合成成功: ${chord}！ 強力な和音スペルを生成。`);
+            // ナギソDCGの強力な魔法に似せて、効果を説明通り実装
             let newC = { name: "Chord: " + chord, cost: 0, val: 15, type: 'dmg', note: null, isChord: true, desc: "相手に15ダメージを与える。" };
             this.p_selected.sort((a,b)=>b-a).forEach(i => this.p_hand.splice(i, 1));
-            this.p_hand.push(newC);
+            
+            if (this.p_hand.length < 10) {
+                this.p_hand.push(newC);
+            } else {
+                this.log(`🔥 手札満杯のため生成カードが燃破した！`);
+            }
             this.has_synthsized = true;
         } else {
             this.log("💥 不協和音です。合成に失敗しました。");
@@ -503,8 +626,14 @@ const game = {
     },
 
     endTurn() {
+        if (!this.is_player_turn) return;
+        this.is_player_turn = false;
         this.log("=== 🤖 CPUのターン ===");
-        document.getElementById('screen-battle').style.pointerEvents = 'none'; // 操作ロック
+        
+        const endBtn = document.getElementById('end-turn-btn');
+        endBtn.disabled = true;
+        endBtn.innerText = '相手のターン中';
+        this.updateUI();
         
         setTimeout(() => {
             while(this.c_mana > 0 && this.c_hand.length > 0) {
@@ -517,19 +646,25 @@ const game = {
                 this.c_hand_len--;
             }
             
-            // プレイヤーターン開始処理
-            if(this.p_max < 10) this.p_max++;
-            this.p_mana = this.p_max;
-            this.c_mana = this.p_max;
-            this.has_synthsized = false;
-            this.cards_played_this_turn = 0;
-            this.last_cost = 0;
-            this.draw('player');
-            this.draw('cpu');
-            
-            document.getElementById('screen-battle').style.pointerEvents = 'auto';
-            this.log("=== 👤 あなたのターン ===");
-            this.updateUI();
+            setTimeout(() => {
+                // プレイヤーターン開始処理
+                if(this.p_max < 10) this.p_max++;
+                this.p_mana = this.p_max;
+                this.c_mana = this.p_max;
+                this.has_synthsized = false;
+                this.cards_played_this_turn = 0;
+                this.last_cost = 0;
+        
+                this.draw('player');
+                this.draw('cpu');
+                
+                this.is_player_turn = true;
+                endBtn.disabled = false;
+                endBtn.innerText = 'ターン終了';
+                
+                this.log("=== 👤 あなたのターン ===");
+                this.updateUI();
+            }, 800);
         }, 1200);
     },
 
@@ -544,33 +679,38 @@ const game = {
         document.getElementById('player-grave').innerText = this.p_grave;
         
         const handDiv = document.getElementById('player-hand');
-        handDiv.innerHTML = this.p_hand.map((c, i) => `
-            <div class="card ${this.p_selected.includes(i) ? 'selected' : ''}" 
+        handDiv.innerHTML = this.p_hand.map((c, i) => {
+            let canPlay = this.is_player_turn && this.p_mana >= c.cost;
+            let isSelected = this.p_selected.includes(i);
+            
+            return `
+            <div class="card ${canPlay ? 'playable' : ''} ${isSelected ? 'selected' : ''}" 
                  onclick="game.toggleSelect(${i})" 
                  ondblclick="game.play(${i})"
-                 style="${this.p_mana < c.cost ? 'opacity:0.5; border-color:#555;' : ''}">
+                 style="${!canPlay && !isSelected ? 'opacity:0.5; border-color:#555;' : ''}">
                 <div class="cost">${c.cost}</div>
                 <div class="note">${c.note || '♪'}</div>
                 <div class="name">${c.name}</div>
                 <div class="effect">${c.desc}</div>
             </div>
-        `).join('');
-
+            `;
+        }).join('');
+        
         const synthDiv = document.getElementById('synth-area');
         synthDiv.innerHTML = this.p_selected.map(i => `
             <div class="card" style="width:80px; min-width:80px; height:110px; min-height:110px; padding:5px; font-size:10px;">
                 <div class="cost" style="width:16px;height:16px;font-size:10px;">${this.p_hand[i].cost}</div>
                 <div class="note" style="font-size:10px;">${this.p_hand[i].note}</div>
-                <div class="name" style="margin-top:15px;">${this.p_hand[i].name}</div>
+                <div class="name" style="margin-top:15px; font-size:10px;">${this.p_hand[i].name}</div>
             </div>
         `).join('');
     },
 
     toggleSelect(i) {
-        if(this.p_hand[i].isChord) return;
+        if(this.p_hand[i].isChord || !this.is_player_turn) return;
         let pos = this.p_selected.indexOf(i);
         if(pos === -1) { 
-            if(this.p_selected.length < 4) this.p_selected.push(i); 
+            if(this.p_selected.length < 4) this.p_selected.push(i);
         } else {
             this.p_selected.splice(pos, 1);
         }
