@@ -4,6 +4,7 @@ c<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Maestro of Fate - Modern Edition</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <style>
         :root { 
             --gold: #ffc107;
@@ -21,12 +22,24 @@ c<!DOCTYPE html>
         }
 
         #app {
+            <div id="matchmaking-screen" class="screen" style="position: absolute; inset: 0; background: var(--app-bg); z-index: 100; justify-content: center; align-items: center;">
+    <h2 style="color: var(--text); margin-bottom: 30px;">マッチング待機中...</h2>
+    <button class="btn" style="background: #dc3545;" onclick="cancelMatch()">キャンセル</button>
+</div>
+
+<div id="match-found-overlay" style="display: none; position: absolute; inset: 0; background: rgba(30, 30, 36, 0.95); z-index: 200; justify-content: center; align-items: center;">
+    <h1 style="color: var(--gold); font-size: clamp(20px, 3vw, 36px); animation: flashText 0.5s ease-in-out infinite;">
+        対戦相手が見つかりました！！
+    </h1>
+</div>}
+        {
             width: 100vw;
             height: 100dvh; background: var(--app-bg); 
             padding: 2vh 2vw; box-sizing: border-box; 
             display: flex; flex-direction: column; position: relative; 
             overflow: hidden;
             font-size: clamp(12px, 1.2vw, 18px);
+       
         }
 
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
@@ -149,6 +162,12 @@ c<!DOCTYPE html>
         .overlay.active { display: flex; }
         .dict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 768px) { .dict-grid { grid-template-columns: 1fr; } }
+
+        @keyframes flashText {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
     </style>
 </head>
 <body>
@@ -207,6 +226,7 @@ c<!DOCTYPE html>
 
             <div style="background: #232730; padding: 15px; border-radius: 10px; border: 1px solid #444;">
                 <button class="action-btn" id="btn-start" onclick="startGame()" disabled>🤖 選択したデッキでCPUと対戦</button>
+                <button class="btn" onclick="startOnlineMatch()">オンラインマッチ</button>
             </div>
         </div>
     </div>
@@ -739,6 +759,48 @@ const game = {
         this.updateUI();
     }
 };
+// RenderのサーバーURLに書き換えてください
+const socket = io('https://maestro-of-fate.onrender.com/'); 
+
+function startOnlineMatch() {
+    // タイトル画面を隠して待機画面を表示
+    document.getElementById('title-screen').classList.remove('active');
+    document.getElementById('matchmaking-screen').style.display = 'flex';
+    
+    // サーバーにマッチングリクエストを送信
+    socket.emit('joinRandomMatch');
+}
+
+function cancelMatch() {
+    // サーバーにキャンセルを通知
+    socket.emit('cancelMatch');
+    
+    // 待機画面を隠してタイトル画面に戻る
+    document.getElementById('matchmaking-screen').style.display = 'none';
+    document.getElementById('title-screen').classList.add('active');
+}
+
+// サーバーからマッチ成立の通知を受け取った時
+socket.on('matchFound', (data) => {
+    // 待機画面を非表示
+    document.getElementById('matchmaking-screen').style.display = 'none';
+    
+    // カットインを表示
+    const foundOverlay = document.getElementById('match-found-overlay');
+    foundOverlay.style.display = 'flex';
+    
+    // 1秒 (1000ms) 待機してからバトル画面へ移行
+    setTimeout(() => {
+        foundOverlay.style.display = 'none';
+        
+        // --- ここでオンライン用の初期化処理を呼び出す ---
+        // ※ 既存の game.init() をオンライン仕様に拡張する必要があります
+        // 例: game.isOnline = true;
+        //     game.roomId = data.roomId;
+        game.init(); 
+        
+    }, 1000);
+});
 
 renderTitle();
 </script>
