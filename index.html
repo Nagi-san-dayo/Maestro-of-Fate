@@ -279,39 +279,39 @@ const NOTE_MAP = {"C":0, "Cis":1, "Des":1, "D":2, "Dis":3, "Es":3, "E":4, "F":5,
 
 const CARD_POOL = [
     // 既存12枚
-    { name: "Grandioso", note: "C", cost: 1, val: 2, type: "dmg", desc: "相手に2ダメージ。" },
-    { name: "Maestoso", note: "E", cost: 2, val: 5, type: "dmg", desc: "相手に5ダメージ。" },
-    { name: "Animato", note: "G", cost: 1, val: 1, type: "draw", desc: "山札から1枚引く。" },
-    { name: "Dolce", note: "F", cost: 1, val: 3, type: "heal", desc: "自身のHPを3回復。" },
-    { name: "Grave", note: "D", cost: 3, val: 8, type: "dmg", desc: "相手に8ダメージ。" },
-    { name: "Brillante", note: "A", cost: 2, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
-    { name: "Furioso", note: "H", cost: 4, val: 12, type: "dmg", desc: "相手に12ダメージ。" },
+    { name: "Grandioso", note: "C", cost: 1, val: 1, type: "dmg", desc: "相手に1ダメージ。" },
+    { name: "Maestoso", note: "E", cost: 2, val: 2, type: "dmg", desc: "相手に2ダメージ。" },
+    { name: "Animato", note: "G", cost: 1, val: 2, type: "draw", desc: "山札から2枚引く。" },
+    { name: "Dolce", note: "F", cost: 1, val: 2, type: "heal", desc: "自身のHPを2回復。" },
+    { name: "Grave", note: "D", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
+    { name: "Brillante", note: "A", cost: 2, val: 2, type: "dmg", desc: "相手に2ダメージ。" },
+    { name: "Furioso", note: "H", cost: 4, val: 6, type: "dmg", desc: "相手に6ダメージ。" },
     { name: "Sostenuto", note: "Cis", cost: 1, val: 2, type: "heal", desc: "自身のHPを2回復。" },
-    { name: "Misterioso", note: "Dis", cost: 2, val: 3, type: "draw", desc: "ランダムに3枚引く。" },
-    { name: "Tranquillo", note: "Fis", cost: 2, val: 6, type: "heal", desc: "自身のHPを6回復。" },
-    { name: "Appassionato", note: "Gis", cost: 3, val: 7, type: "dmg", desc: "相手に7ダメージ。" },
-    { name: "Risoluto", note: "B", cost: 1, val: 1, type: "draw", desc: "山札から1枚引く。" },
+    { name: "Misterioso", note: "Dis", cost: 2, val: 3, type: "draw", desc: "山札から3枚引く。" },
+    { name: "Tranquillo", note: "Fis", cost: 2, val: 4, type: "heal", desc: "自身のHPを4回復。" },
+    { name: "Appassionato", note: "Gis", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
+    { name: "Risoluto", note: "B", cost: 1, val: 2, type: "draw", desc: "山札から2枚引く。" },
     // 追加20枚
-    { name: "Crescendo", note: "C", cost: 2, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
-    { name: "Allegro", note: "D", cost: 1, val: 1, type: "draw", desc: "山札から1枚引く。" },
-    { name: "Vivace", note: "E", cost: 3, val: 9, type: "dmg", desc: "相手に9ダメージ。" },
-    { name: "Moderato", note: "F", cost: 2, val: 5, type: "heal", desc: "自身のHPを5回復。" },
+    { name: "Crescendo", note: "C", cost: 2, val: 2, type: "dmg", desc: "相手に2ダメージ。" },
+    { name: "Allegro", note: "D", cost: 1, val: 2, type: "draw", desc: "山札から1枚引く。" },
+    { name: "Vivace", note: "E", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
+    { name: "Moderato", note: "F", cost: 2, val: 4, type: "heal", desc: "自身のHPを4回復。" },
     { name: "Legato", note: "G", cost: 1, val: 2, type: "heal", desc: "自身のHPを2回復。" },
-    { name: "Staccato", note: "A", cost: 1, val: 3, type: "dmg", desc: "相手に3ダメージ。" },
-    { name: "Presto", note: "B", cost: 2, val: 6, type: "dmg", desc: "相手に6ダメージ。" },
+    { name: "Staccato", note: "A", cost: 1, val: 1, type: "dmg", desc: "相手に1ダメージ。" },
+    { name: "Presto", note: "B", cost: 4, val: 6, type: "dmg", desc: "山札から6枚引く" },
     { name: "Cantabile", note: "Cis", cost: 2, val: 4, type: "heal", desc: "自身のHPを4回復。" },
-    { name: "Scherzo", note: "Dis", cost: 3, val: 2, type: "draw", desc: "山札から2枚引く。" },
-    { name: "Largo", note: "Fis", cost: 3, val: 10, type: "dmg", desc: "相手に10ダメージ。" },
-    { name: "Adagio", note: "Gis", cost: 2, val: 5, type: "heal", desc: "自身のHPを5回復。" },
-    { name: "Marcato", note: "H", cost: 3, val: 8, type: "dmg", desc: "相手に8ダメージ。" },
-    { name: "Glissando", note: "C", cost: 3, val: 2, type: "draw", desc: "山札から2枚引く。" },
-    { name: "Tremolo", note: "D", cost: 2, val: 5, type: "dmg", desc: "相手に5ダメージ。" },
-    { name: "Pizzicato", note: "E", cost: 1, val: 2, type: "dmg", desc: "相手に2ダメージ。" },
-    { name: "Espressivo", note: "F", cost: 3, val: 8, type: "heal", desc: "自身のHPを8回復。" },
-    { name: "Fortissimo", note: "G", cost: 4, val: 14, type: "dmg", desc: "相手に14ダメージ。" },
-    { name: "Pianissimo", note: "A", cost: 1, val: 1, type: "heal", desc: "自身のHPを1回復。" },
-    { name: "Arpeggio", note: "B", cost: 2, val: 2, type: "draw", desc: "山札から2枚引く。" },
-    { name: "Morendo", note: "Cis", cost: 3, val: 9, type: "dmg", desc: "相手に9ダメージ。" }
+    { name: "Scherzo", note: "Dis", cost: 2, val: 3, type: "draw", desc: "山札から3枚引く。" },
+    { name: "Largo", note: "Fis", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
+    { name: "Adagio", note: "Gis", cost: 2, val: 4, type: "heal", desc: "自身のHPを4回復。" },
+    { name: "Marcato", note: "H", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
+    { name: "Glissando", note: "C", cost: 2, val: 3, type: "draw", desc: "山札から3枚引く。" },
+    { name: "Tremolo", note: "D", cost: 2, val: 2, type: "dmg", desc: "相手に2ダメージ。" },
+    { name: "Pizzicato", note: "E", cost: 1, val: 1, type: "dmg", desc: "相手に1ダメージ。" },
+    { name: "Espressivo", note: "F", cost: 3, val: 6, type: "heal", desc: "自身のHPを6回復。" },
+    { name: "Fortissimo", note: "G", cost: 4, val: 6, type: "dmg", desc: "相手に6ダメージ。" },
+    { name: "Pianissimo", note: "A", cost: 1, val: 2, type: "heal", desc: "自身のHPを2回復。" },
+    { name: "Arpeggio", note: "B", cost: 2, val: 3, type: "draw", desc: "山札から3枚引く。" },
+    { name: "Morendo", note: "Cis", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" }
 ];
 
 let customDecks = JSON.parse(localStorage.getItem("mof_decks")) || Array(10).fill(null);
@@ -569,7 +569,7 @@ const game = {
             newCard = {
                 name: "不協和音 (Dissonance)",
                 cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 5,
-                desc: "狂乱の音塊。相手に10ダメを与えるが自身も5ダメ受ける。",
+                desc: "相手に10ダメージ 自分に5ダメージ",
                 isChord: true
             };
             this.log("💥 不協和音が発生！危険な魔法カードが生成されました。");
@@ -637,17 +637,17 @@ const game = {
         }
 
         let descParts = [];
-        if (dmg > 0) descParts.push(`相手に${dmg}ダメ`);
+        if (dmg > 0) descParts.push(`相手に${dmg}ダメージ`);
         if (heal > 0) descParts.push(`HP${heal}回復`);
         if (draw > 0) descParts.push(`${draw}枚引く`);
         if (mana > 0) descParts.push(`マナ${mana}回復`);
-        if (recoil > 0) descParts.push(`反動${recoil}ダメ`);
+        if (recoil > 0) descParts.push(`反動${recoil}ダメージ`);
 
         return {
             name: `【和音】${chordName}`,
             cost: 0,
             dmg, heal, draw, mana, recoil,
-            desc: descParts.join('、') + '。',
+            desc: descParts.join('<br>') ,
             isChord: true
         };
     },
