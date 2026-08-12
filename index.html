@@ -456,22 +456,31 @@ function startGame() {
 
 // --- バトルシステム ---
 const game = {
+    is_online: false,
     p_hp: 30, c_hp: 30, p_mana: 1, p_max: 1, p_hand: [], p_deck: [],
     c_mana: 1, c_hand: [], c_deck: [], c_hand_len: 0, c_deck_len: 30,
     p_grave: 0, p_selected: [], has_synthsized: false, is_player_turn: true,
 
-    init(deck) {
+    init(deck, isOnline = false) {
+        this.is_online = isOnline;
         this.p_hp = 30; this.c_hp = 30; this.p_mana = 1; this.p_max = 1; this.c_mana = 1;
         this.p_grave = 0; this.p_hand = []; this.c_hand = []; this.p_selected = [];
         this.has_synthsized = false; this.is_player_turn = true;
-        
+        this.is_player_turn = true;
+
         document.getElementById('log-list').innerHTML = '';
         this.p_deck = deck.sort(() => Math.random() - 0.5);
+        if(this.is_online){
+            this.c_deck_len = 30;
+            this.c_hand_len = 3
+            for(let i=0; i<3; i++) { this.draw('player');}
+            this.log("⚔️ オンラインマッチ開始！");
+        } else {
         this.c_deck = Array(30).fill(0).map(() => ({...CARD_POOL[Math.floor(Math.random()*CARD_POOL.length)], id: Math.random()}));
         this.c_hand_len = 0; this.c_deck_len = 30;
-
         for(let i=0; i<3; i++) { this.draw('player'); this.draw('cpu'); }
         this.log("⚔️ バトル開始！あなたのターンです。");
+        }
         this.updateUI();
     },
 
@@ -674,13 +683,19 @@ const game = {
     },
 
     endTurn() {
-        if (!this.is_player_turn) return;
+        if(!this.is_player_turn) return;
         this.is_player_turn = false;
-        this.log("=== 🤖 CPUのターン ===");
-        
+
         const endBtn = document.getElementById('end-turn-btn');
         endBtn.disabled = true; endBtn.innerText = '相手のターン中';
         this.updateUI();
+        if(this.is_online){
+            this.log("=== 🌐 相手のターン ===");
+            socket.emit('endTurn');
+            return; // ★これより下のCPUロジックは実行させない
+        }     
+        this.log("=== 🤖 CPUのターン ===");
+      
 
         setTimeout(() => {
             while(this.c_mana > 0 && this.c_hand.length > 0) {
@@ -808,7 +823,7 @@ socket.on('matchFound', (data) => {
         }));
 
         // 3. デッキを渡して初期化
-        game.init(pDeck); 
+        game.init(pDeck, true); 
 
         // 4. 戦闘画面を表示（画面切り替え）
         showScreen('screen-battle');
