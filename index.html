@@ -763,7 +763,15 @@ const game = {
 // RenderのサーバーURLに書き換えてください
 const socket = io('https://maestro-of-fate.onrender.com/'); 
 
+// --- オンラインマッチ関連処理 ---
+
 function startOnlineMatch() {
+    // 1. デッキが選択されているかチェック
+    if (selectedDeckSlot === -1 || !customDecks[selectedDeckSlot]) {
+        alert("対戦で使用するデッキを選択してください。");
+        return;
+    }
+
     // タイトル画面を隠して待機画面を表示
     document.getElementById('screen-title').classList.remove('active');
     document.getElementById('matchmaking-screen').style.display = 'flex';
@@ -775,7 +783,6 @@ function startOnlineMatch() {
 function cancelMatch() {
     // サーバーにキャンセルを通知
     socket.emit('cancelMatch');
-    
     // 待機画面を隠してタイトル画面に戻る
     document.getElementById('matchmaking-screen').style.display = 'none';
     document.getElementById('screen-title').classList.add('active');
@@ -794,16 +801,23 @@ socket.on('matchFound', (data) => {
     setTimeout(() => {
         foundOverlay.style.display = 'none';
         
-        // --- ここでオンライン用の初期化処理を呼び出す ---
-        // ※ 既存の game.init() をオンライン仕様に拡張する必要があります
-        // 例: game.isOnline = true;
-        //     game.roomId = data.roomId;
-        game.init(); 
+        // 2. 選択されたデッキデータを生成
+        let pDeck = customDecks[selectedDeckSlot].map(name => ({
+            ...CARD_POOL.find(c => c.name === name), 
+            id: Math.random()
+        }));
+
+        // 3. デッキを渡して初期化
+        game.init(pDeck); 
+
+        // 4. 戦闘画面を表示（画面切り替え）
+        showScreen('screen-battle');
         
     }, 1000);
 });
 
 renderTitle();
+
 </script>
 </body>
 </html>
