@@ -830,6 +830,31 @@ socket.on('matchFound', (data) => {
         
     }, 1000);
 });
+// 相手がターンを終了したとき
+socket.on('opponentEndTurn', () => {
+    game.is_player_turn = true;
+    game.has_synthsized = false;
+    game.p_mana = Math.min(10, game.p_max + 1);
+    game.p_max = game.p_mana;
+    game.draw('player'); // ドロー処理
+    
+    document.getElementById('end-turn-btn').disabled = false;
+    document.getElementById('end-turn-btn').innerText = 'ターン終了';
+    game.log("=== 👤 あなたのターン ===");
+    game.updateUI();
+});
+
+// 相手がアクションを実行したとき
+socket.on('receiveAction', (action) => {
+    // 例: action = { type: 'play', card: {...} } や { type: 'synth', chord: {...} }
+    // 相手のアクション内容に応じて自分の画面（相手HPやログ等）を更新する処理
+});
+
+// 相手が切断した場合
+socket.on('opponentDisconnected', () => {
+    alert("⚠️ 対戦相手の接続が切断されました。あなたの勝利です！");
+    showScreen('screen-title');
+});
 
 renderTitle();
 
