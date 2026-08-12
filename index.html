@@ -216,7 +216,8 @@ c<!DOCTYPE html>
 
             <div style="background: #232730; padding: 15px; border-radius: 10px; border: 1px solid #444;">
                 <button class="action-btn" id="btn-start" onclick="startGame()" disabled>🤖 選択したデッキでCPUと対戦</button>
-                <button class="btn" onclick="startOnlineMatch()">オンラインマッチ</button>
+                <button class="action-btn" style="background: #007bff;" onclick="startOnlineMatch()">🌐 オンラインマッチ</button>
+
             </div>
         </div>
     </div>
@@ -764,7 +765,7 @@ const socket = io('https://maestro-of-fate.onrender.com/');
 
 function startOnlineMatch() {
     // タイトル画面を隠して待機画面を表示
-    document.getElementById('title-screen').classList.remove('active');
+    document.getElementById('screen-title').classList.remove('active');
     document.getElementById('matchmaking-screen').style.display = 'flex';
     
     // サーバーにマッチングリクエストを送信
@@ -777,7 +778,7 @@ function cancelMatch() {
     
     // 待機画面を隠してタイトル画面に戻る
     document.getElementById('matchmaking-screen').style.display = 'none';
-    document.getElementById('title-screen').classList.add('active');
+    document.getElementById('screen-title').classList.add('active');
 }
 
 // サーバーからマッチ成立の通知を受け取った時
