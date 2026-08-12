@@ -22,17 +22,8 @@ c<!DOCTYPE html>
         }
 
         #app {
-            <div id="matchmaking-screen" class="screen" style="position: absolute; inset: 0; background: var(--app-bg); z-index: 100; justify-content: center; align-items: center;">
-    <h2 style="color: var(--text); margin-bottom: 30px;">マッチング待機中...</h2>
-    <button class="btn" style="background: #dc3545;" onclick="cancelMatch()">キャンセル</button>
-</div>
-
-<div id="match-found-overlay" style="display: none; position: absolute; inset: 0; background: rgba(30, 30, 36, 0.95); z-index: 200; justify-content: center; align-items: center;">
-    <h1 style="color: var(--gold); font-size: clamp(20px, 3vw, 36px); animation: flashText 0.5s ease-in-out infinite;">
-        対戦相手が見つかりました！！
-    </h1>
-</div>}
-        {
+          
+        
             width: 100vw;
             height: 100dvh; background: var(--app-bg); 
             padding: 2vh 2vw; box-sizing: border-box; 
@@ -41,6 +32,7 @@ c<!DOCTYPE html>
             font-size: clamp(12px, 1.2vw, 18px);
        
         }
+        
 
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
         .active { display: flex !important; }
@@ -289,6 +281,16 @@ c<!DOCTYPE html>
             </div>
         </div>
     </div>
+      <div id="matchmaking-screen" class="screen" style="position: absolute; inset: 0; background: var(--app-bg); z-index: 100; justify-content: center; align-items: center;">
+    <h2 style="color: var(--text); margin-bottom: 30px;">マッチング待機中...</h2>
+    <button class="btn" style="background: #dc3545;" onclick="cancelMatch()">キャンセル</button>
+</div>
+
+<div id="match-found-overlay" style="display: none; position: absolute; inset: 0; background: rgba(30, 30, 36, 0.95); z-index: 200; justify-content: center; align-items: center;">
+    <h1 style="color: var(--gold); font-size: clamp(20px, 3vw, 36px); animation: flashText 0.5s ease-in-out infinite;">
+        対戦相手が見つかりました！！
+    </h1>
+</div>
 
 </div>
 
