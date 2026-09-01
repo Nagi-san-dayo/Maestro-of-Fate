@@ -175,27 +175,27 @@
             <div class="dict-grid">
                 <div style="background: #151518; padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold);">
                     <div style="font-weight: bold; color: #fff;">【メジャーコード (Major)】</div>
-                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 4半音上 + 7半音上 (3枚)<br>基準音ごとの強力な攻撃・回復効果。</div>
+                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 4半音上 + 7半音上 (3枚)<br>明るいやーつ</div>
                 </div>
                 <div style="background: #151518; padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold);">
                     <div style="font-weight: bold; color: #fff;">【マイナーコード (minor)】</div>
-                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 3半音上 + 7半音上 (3枚)<br>攻撃と回復・ドローを兼ね備えたバランス効果。</div>
+                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 3半音上 + 7半音上 (3枚)<br>暗いやーつ</div>
                 </div>
                 <div style="background: #151518; padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold);">
                     <div style="font-weight: bold; color: #fff;">【サスフォーコード (sus4)】</div>
-                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 5半音上 + 7半音上 (3枚)<br>高威力＋マナ回復など｡</div>
+                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 5半音上 + 7半音上 (3枚)<br>どーっちどっちの音</div>
                 </div>
                 <div style="background: #151518; padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold);">
                     <div style="font-weight: bold; color: #fff;">【セブンスコード (7th)】</div>
-                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 4半音上 + 7半音上 + 10半音上 (4枚)<br>高威力＋ドローなど｡</div>
+                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 4半音上 + 7半音上 + 10半音上 (4枚)<br>メジャーを少しオシャに</div>
                 </div>
                 <div style="background: #151518; padding: 10px; border-radius: 6px; border-left: 4px solid var(--gold);">
                     <div style="font-weight: bold; color: #fff;">【ナインスコード (9th)】</div>
-                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 2半音上 + 4半音上 + 7半音上 (4枚)<br>最高威力。</div>
+                    <div style="color: #ccc; font-size: 12px;">構成音: 基準音 + 2半音上 + 4半音上 + 7半音上 (4枚)<br>お前を殺す｡</div>
                 </div>
                 <div style="background: #151518; padding: 10px; border-radius: 6px; border-left: 4px solid #dc3545;">
                     <div style="font-weight: bold; color: #ff6b6b;">【不協和音 (Dissonance)】</div>
-                    <div style="color: #ccc; font-size: 12px;">構成音: レシピ不一致の3〜4枚選択<br>相手に10ダメージ｡自分に5ダメージ｡</div>
+                    <div style="color: #ccc; font-size: 12px;">構成音: レシピ不一致の3〜4枚選択<br>相手に10､自分に5ダメージ</div>
                 </div>
             </div>
         </div>
@@ -335,13 +335,67 @@ const CARD_POOL = [
     { name: "Morendo", note: "Cis", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
         // 和音カード
     // chordRoot と chordType が、合成時に対応するコードを識別するための値
-    { name: "【和音】C Major", note: "C", cost: 0, dmg: 13, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に13ダメージ。HP4回復。", isChord: true, chordRoot: "C", chordType: "Major" },
-    { name: "【和音】C minor", note: "C", cost: 0, dmg: 8, heal: 6, draw: 1, mana: 0, recoil: 0, desc: "相手に8ダメージ。HP6回復。1枚引く。", isChord: true, chordRoot: "C", chordType: "minor" },
-    { name: "【和音】C sus4", note: "C", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 1, recoil: 0, desc: "相手に10ダメージ。マナ1回復。", isChord: true, chordRoot: "C", chordType: "sus4" },
-    { name: "【和音】C 7th", note: "C", cost: 0, dmg: 19, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に19ダメージ。2枚引く。", isChord: true, chordRoot: "C", chordType: "7th" },
-    { name: "【和音】C 9th", note: "C", cost: 0, dmg: 23, heal: 0, draw: 0, mana: 2, recoil: 5, desc: "相手に23ダメージ。マナ2回復。反動5ダメージ。", isChord: true, chordRoot: "C", chordType: "9th" },
+    { name: "【和音】C Major", note: "C", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "C", chordType: "Major" },
+    { name: "【和音】C minor", note: "C", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "C", chordType: "minor" },
+    { name: "【和音】C sus4", note: "C", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復｡", isChord: true, chordRoot: "C", chordType: "sus4" },
+    { name: "【和音】C 7th", note: "C", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "C", chordType: "7th" },
+    { name: "【和音】C 9th", note: "C", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "C", chordType: "9th" },
+    { name: "【和音】Cis Major", note: "Cis", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "Cis", chordType: "Major" },
+    { name: "【和音】Cis minor", note: "Cis", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "Cis", chordType: "minor" },
+    { name: "【和音】Cis sus4", note: "Cis", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "Cis", chordType: "sus4" },
+    { name: "【和音】Cis 7th", note: "Cis", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "Cis", chordType: "7th" },
+    { name: "【和音】Cis 9th", note: "Cis", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "Cis", chordType: "9th" },
+    { name: "【和音】D Major", note: "D", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "D", chordType: "Major" },
+    { name: "【和音】D minor", note: "D", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "D", chordType: "minor" },
+    { name: "【和音】D sus4", note: "D", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "D", chordType: "sus4" },
+    { name: "【和音】D 7th", note: "D", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "D", chordType: "7th" },
+    { name: "【和音】D 9th", note: "D", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "D", chordType: "9th" },
+    { name: "【和音】Dis Major", note: "Dis", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "Dis", chordType: "Major" },
+    { name: "【和音】Dis minor", note: "Dis", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "Dis", chordType: "minor" },
+    { name: "【和音】Dis sus4", note: "Dis", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "Dis", chordType: "sus4" },
+    { name: "【和音】Dis 7th", note: "Dis", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "Dis", chordType: "7th" },
+    { name: "【和音】Dis 9th", note: "Dis", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "Dis", chordType: "9th" },
+    { name: "【和音】E Major", note: "E", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "E", chordType: "Major" },
+    { name: "【和音】E minor", note: "E", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "E", chordType: "minor" },
+    { name: "【和音】E sus4", note: "E", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "E", chordType: "sus4" },
+    { name: "【和音】E 7th", note: "E", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "E", chordType: "7th" },
+    { name: "【和音】E 9th", note: "E", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "E", chordType: "9th" },
+    { name: "【和音】F Major", note: "F", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "F", chordType: "Major" },
+    { name: "【和音】F minor", note: "F", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "F", chordType: "minor" },
+    { name: "【和音】F sus4", note: "F", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "F", chordType: "sus4" },
+    { name: "【和音】F 7th", note: "F", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "F", chordType: "7th" },
+    { name: "【和音】F 9th", note: "F", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "F", chordType: "9th" },
+    { name: "【和音】Fis Major", note: "Fis", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "Fis", chordType: "Major" },
+    { name: "【和音】Fis minor", note: "Fis", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "Fis", chordType: "minor" },
+    { name: "【和音】Fis sus4", note: "Fis", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "Fis", chordType: "sus4" },
+    { name: "【和音】Fis 7th", note: "Fis", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "Fis", chordType: "7th" },
+    { name: "【和音】Fis 9th", note: "Fis", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "Fis", chordType: "9th" },
+    { name: "【和音】G Major", note: "G", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "G", chordType: "Major" },
+    { name: "【和音】G minor", note: "G", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "G", chordType: "minor" },
+    { name: "【和音】G sus4", note: "G", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "G", chordType: "sus4" },
+    { name: "【和音】G 7th", note: "G", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "G", chordType: "7th" },
+    { name: "【和音】G 9th", note: "G", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "G", chordType: "9th" },
+    { name: "【和音】Gis Major", note: "Gis", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "Gis", chordType: "Major" },
+    { name: "【和音】Gis minor", note: "Gis", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "Gis", chordType: "minor" },
+    { name: "【和音】Gis sus4", note: "Gis", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "Gis", chordType: "sus4" },
+    { name: "【和音】Gis 7th", note: "Gis", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "Gis", chordType: "7th" },
+    { name: "【和音】Gis 9th", note: "Gis", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "Gis", chordType: "9th" },
+    { name: "【和音】A Major", note: "A", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "A", chordType: "Major" },
+    { name: "【和音】A minor", note: "A", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "A", chordType: "minor" },
+    { name: "【和音】A sus4", note: "A", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "A", chordType: "sus4" },
+    { name: "【和音】A 7th", note: "A", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "A", chordType: "7th" },
+    { name: "【和音】A 9th", note: "A", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "A", chordType: "9th" },
+    { name: "【和音】B Major", note: "B", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "B", chordType: "Major" },
+    { name: "【和音】B minor", note: "B", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "B", chordType: "minor" },
+    { name: "【和音】B sus4", note: "B", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "B", chordType: "sus4" },
+    { name: "【和音】B 7th", note: "B", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "B", chordType: "7th" },
+    { name: "【和音】B 9th", note: "B", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "B", chordType: "9th" },
+    { name: "【和音】H Major", note: "H", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に10ダメージ｡", isChord: true, chordRoot: "H", chordType: "Major" },
+    { name: "【和音】H minor", note: "H", cost: 0, dmg: 9, heal: 0, draw: 1, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 山札から1枚引く｡", isChord: true, chordRoot: "H", chordType: "minor" },
+    { name: "【和音】H sus4", note: "H", cost: 0, dmg: 9, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "H", chordType: "sus4" },
+    { name: "【和音】H 7th", note: "H", cost: 0, dmg: 15, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "H", chordType: "7th" },
+    { name: "【和音】H 9th", note: "H", cost: 0, dmg: 30, heal: 0, draw: 0, mana: 0, recoil: 0, desc: "相手に30ダメージ", isChord: true, chordRoot: "H", chordType: "9th" },
 ];
-
 let customDecks = JSON.parse(localStorage.getItem("mof_decks")) || Array(10).fill(null);
 let currentSlot = 0;
 let editingDeck = [];
@@ -657,7 +711,6 @@ const game = {
     synthesize() {
         if (!this.is_player_turn) return;
         if(this.p_selected.length < 3) return this.log("⚠️ 合成には3枚以上選択してください。");
-        if(this.has_synthsized) return this.log("⚠️ 合成は1ターンに1回までです。");
 
         let notes = this.p_selected.map(i => this.p_hand[i].note);
         let chordData = this.detectChord(notes);
