@@ -332,7 +332,14 @@ const CARD_POOL = [
     { name: "Fortissimo", note: "G", cost: 4, val: 6, type: "dmg", desc: "相手に6ダメージ。" },
     { name: "Pianissimo", note: "A", cost: 1, val: 2, type: "heal", desc: "自身のHPを2回復。" },
     { name: "Arpeggio", note: "B", cost: 2, val: 3, type: "draw", desc: "山札から3枚引く。" },
-    { name: "Morendo", note: "Cis", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" }
+    { name: "Morendo", note: "Cis", cost: 3, val: 4, type: "dmg", desc: "相手に4ダメージ。" },
+        // 和音カード
+    // chordRoot と chordType が、合成時に対応するコードを識別するための値
+    { name: "【和音】C Major", note: "C", cost: 0, dmg: 13, heal: 4, draw: 0, mana: 0, recoil: 0, desc: "相手に13ダメージ。HP4回復。", isChord: true, chordRoot: "C", chordType: "Major" },
+    { name: "【和音】C minor", note: "C", cost: 0, dmg: 8, heal: 6, draw: 1, mana: 0, recoil: 0, desc: "相手に8ダメージ。HP6回復。1枚引く。", isChord: true, chordRoot: "C", chordType: "minor" },
+    { name: "【和音】C sus4", note: "C", cost: 0, dmg: 10, heal: 0, draw: 0, mana: 1, recoil: 0, desc: "相手に10ダメージ。マナ1回復。", isChord: true, chordRoot: "C", chordType: "sus4" },
+    { name: "【和音】C 7th", note: "C", cost: 0, dmg: 19, heal: 0, draw: 2, mana: 0, recoil: 0, desc: "相手に19ダメージ。2枚引く。", isChord: true, chordRoot: "C", chordType: "7th" },
+    { name: "【和音】C 9th", note: "C", cost: 0, dmg: 23, heal: 0, draw: 0, mana: 2, recoil: 5, desc: "相手に23ダメージ。マナ2回復。反動5ダメージ。", isChord: true, chordRoot: "C", chordType: "9th" },
 ];
 
 let customDecks = JSON.parse(localStorage.getItem("mof_decks")) || Array(10).fill(null);
@@ -395,33 +402,49 @@ function saveDeck() {
 
 function updateEditor() {
     const pool = document.getElementById('pool-grid');
-    pool.innerHTML = CARD_POOL.map((c) => {
-        let count = editingDeck.filter(name => name === c.name).length;
-        let isPlayable = count < 3;
-        return `
-        <div class="card ${isPlayable ? 'playable' : ''}" onclick="addCard('${c.name}')" style="${!isPlayable ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
-            <div class="cost">${c.cost}</div>
-            <div class="note">${c.note}</div>
-            <div class="name">${c.name}</div>
-            <div class="effect">${c.desc}</div>
-            <div class="card-count">編成中: ${count} / 3</div>
-        </div>
-        `;
-    }).join('');
+
+    // 和音カードはデッキ編集画面には表示しない
+    pool.innerHTML = CARD_POOL
+        .filter(c => !c.isChord)
+        .map((c) => {
+            let count = editingDeck.filter(name => name === c.name).length;
+            let isPlayable = count < 3;
+
+            return `
+            <div class="card ${isPlayable ? 'playable' : ''}" 
+                 onclick="addCard('${c.name}')" 
+                 style="${!isPlayable ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
+                <div class="cost">${c.cost}</div>
+                <div class="note">${c.note}</div>
+                <div class="name">${c.name}</div>
+                <div class="effect">${c.desc}</div>
+                <div class="card-count">編成中: ${count} / 3</div>
+            </div>
+            `;
+        }).join('');
 
     const stack = document.getElementById('deck-stacked-view');
     let counts = {};
-    editingDeck.forEach(name => { counts[name] = (counts[name]||0)+1; });
-    let sortedKeys = Object.keys(counts).sort((a,b) => CARD_POOL.find(c=>c.name===a).cost - CARD_POOL.find(c=>c.name===b).cost);
-    
+
+    editingDeck.forEach(name => {
+        counts[name] = (counts[name] || 0) + 1;
+    });
+
+    let sortedKeys = Object.keys(counts).sort(
+        (a,b) => CARD_POOL.find(c => c.name === a).cost -
+                  CARD_POOL.find(c => c.name === b).cost
+    );
+
     stack.innerHTML = sortedKeys.map(name => {
         let c = CARD_POOL.find(card => card.name === name);
+
         return `
         <div class="stacked-item" onclick="removeCard('${name}')">
             <div style="display:flex; align-items:center; gap:10px;">
                 <span style="background:#007bff; color:white; border-radius:50%; width:20px; height:20px; display:inline-flex; justify-content:center; align-items:center; font-size:11px; font-weight:bold;">${c.cost}</span>
                 <span style="font-weight:bold; font-size: 13px;">${name}</span>
             </div>
+
             <div style="display:flex; align-items:center; gap:10px;">
                 <span style="font-size: 11px; color: #aaa;">(${c.note})</span>
                 <span style="background:var(--gold); color:#000; font-weight:bold; padding:2px 6px; border-radius:4px; font-size:12px;">${counts[name]}枚</span>
@@ -430,14 +453,33 @@ function updateEditor() {
         `;
     }).join('');
 
-    document.getElementById('deck-count-display').innerText = `現在の合計枚数: (${editingDeck.length} / 30 枚)`;
+    document.getElementById('deck-count-display').innerText =
+        `現在の合計枚数: (${editingDeck.length} / 30 枚)`;
+
     let saveBtn = document.getElementById('btn-save');
+
     saveBtn.disabled = editingDeck.length !== 30;
-    saveBtn.innerText = editingDeck.length === 30 ? '💾 デッキを保存して戻る' : '30枚に調整してください';
+
+    saveBtn.innerText =
+        editingDeck.length === 30
+            ? '💾 デッキを保存して戻る'
+            : '30枚に調整してください';
 }
 
 function addCard(name) {
-    if(editingDeck.length >= 30 || editingDeck.filter(n => n === name).length >= 3) return;
+    const card = CARD_POOL.find(c => c.name === name);
+
+    // 和音カードは合成専用なので直接デッキには入れられない
+    if (!card || card.isChord) {
+        return;
+    }
+
+    // デッキ30枚制限
+    if (editingDeck.length >= 30) return;
+
+    // 同名カード3枚制限
+    if (editingDeck.filter(n => n === name).length >= 3) return;
+
     editingDeck.push(name);
     updateEditor();
 }
@@ -621,9 +663,31 @@ const game = {
         let chordData = this.detectChord(notes);
         let newCard;
 
-        if(chordData) {
-            newCard = this.generateChordCard(chordData.root, chordData.type);
-            this.log(`🎹 和音合成成功: 【${newCard.name}】を生成！`);
+       if(chordData) {
+    const rootName = NOTES[chordData.root];
+
+    // カードプールから対応する和音カードを探す
+    const chordCard = CARD_POOL.find(c =>
+        c.isChord &&
+        c.chordRoot === rootName &&
+        c.chordType === chordData.type
+    );
+
+    // 対応する和音カードが登録されていない場合
+    if (!chordCard) {
+        this.log(
+            `⚠️ 【${rootName} ${chordData.type}】の和音カードがカードプールに登録されていません。`
+        );
+        return;
+    }
+
+    // カードプールのデータをコピーして生成
+    newCard = {
+        ...chordCard,
+        id: Math.random()
+    };
+
+    this.log(`🎹 和音合成成功: 【${newCard.name}】を生成！`);
         } else {
             // 不協和音カード（強威力・自傷リスク）
             newCard = {
@@ -669,52 +733,6 @@ const game = {
         }
         return null;
       },
-
-    // 12音階 × 5種類の和音ごとにすべて異なる効果を生成するロジック
-    generateChordCard(rootIdx, type) {
-        const rootName = NOTES[rootIdx];
-        const chordName = `${rootName} ${type}`;
-        
-        let dmg = 0, heal = 0, draw = 0, mana = 0, recoil = 0;
-        const rMod = rootIdx + 1; // 1 〜 12
-
-        if (type === "Major") {
-            dmg = 12 + Math.floor(rMod * 0.8);
-            if (rootIdx % 3 === 0) heal = 4;
-            if (rootIdx % 3 === 1) draw = 1;
-            if (rootIdx % 3 === 2) dmg += 4;
-        } else if (type === "minor") {
-            dmg = 8 + Math.floor(rMod * 0.5);
-            heal = 6 + Math.floor(rMod * 0.5);
-            if (rootIdx % 2 === 0) draw = 1;
-        } else if (type === "sus4") {
-            dmg = 10 + rMod;
-            mana = 1 + (rootIdx >= 6 ? 1 : 0);
-        } else if (type === "7th") {
-            dmg = 18 + rMod;
-            if (rootIdx % 2 === 1) heal = 6;
-            if (rootIdx % 2 === 0) draw = 2;
-        } else if (type === "9th") {
-            dmg = 22 + Math.floor(rMod * 1.2);
-            mana = 2;
-            if (rootIdx % 3 === 0) recoil = 5;
-        }
-
-        let descParts = [];
-        if (dmg > 0) descParts.push(`相手に${dmg}ダメージ`);
-        if (heal > 0) descParts.push(`HP${heal}回復`);
-        if (draw > 0) descParts.push(`${draw}枚引く`);
-        if (mana > 0) descParts.push(`マナ${mana}回復`);
-        if (recoil > 0) descParts.push(`反動${recoil}ダメージ`);
-
-        return {
-            name: `【和音】${chordName}`,
-            cost: 0,
-            dmg, heal, draw, mana, recoil,
-            desc: descParts.join('<br>') ,
-            isChord: true
-        };
-    },
 
     endTurn() {
         if(!this.is_player_turn) return;
