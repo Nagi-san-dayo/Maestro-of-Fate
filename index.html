@@ -857,7 +857,7 @@ socket.on('matchFound', (data) => {
         }));
 
         // 3. デッキを渡して初期化
-        game.init(pDeck, true, isMyTurn); 
+        game.init(pDeck, true, data.isMyTurn); 
 
         // 4. 戦闘画面を表示（画面切り替え）
         showScreen('screen-battle');
