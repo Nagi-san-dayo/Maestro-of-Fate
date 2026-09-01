@@ -461,21 +461,37 @@ const game = {
     c_mana: 1, c_hand: [], c_deck: [], c_hand_len: 0, c_deck_len: 30,
     p_grave: 0, p_selected: [], has_synthsized: false, is_player_turn: true,
 
-    init(deck, isOnline = false) {
+   // 【修正後】
+    init(deck, isOnline = false, isMyTurn = true) { // 引数に isMyTurn を追加
         this.is_online = isOnline;
         this.p_hp = 30; this.c_hp = 30; this.p_mana = 1; this.p_max = 1; this.c_mana = 1;
         this.p_grave = 0; this.p_hand = []; this.c_hand = []; this.p_selected = [];
-        this.has_synthsized = false; this.is_player_turn = true;
-        this.is_player_turn = true;
+        this.has_synthsized = false; 
+        this.is_player_turn = isMyTurn; // ★ サーバーからの指示をセット
 
         document.getElementById('log-list').innerHTML = '';
         this.p_deck = deck.sort(() => Math.random() - 0.5);
+        
         if(this.is_online){
             this.c_deck_len = 30;
-            this.c_hand_len = 3
-            for(let i=0; i<3; i++) { this.draw('player');}
+            this.c_hand_len = 3;
+            for(let i=0; i<3; i++) { this.draw('player'); }
             this.log("⚔️ オンラインマッチ開始！");
+            
+            // ★ 先攻・後攻によるUI（ボタン）制御を追加
+            const endBtn = document.getElementById('end-turn-btn');
+            if(!this.is_player_turn) {
+                this.log("⏳ 相手のターンから始まります。");
+                endBtn.disabled = true; 
+                endBtn.innerText = '相手のターン中';
+            } else {
+                this.log("=== 👤 あなたのターン（先攻） ===");
+                endBtn.disabled = false; 
+                endBtn.innerText = 'ターン終了';
+            }
         } else {
+// ...以下略...
+
         this.c_deck = Array(30).fill(0).map(() => ({...CARD_POOL[Math.floor(Math.random()*CARD_POOL.length)], id: Math.random()}));
         this.c_hand_len = 0; this.c_deck_len = 30;
         for(let i=0; i<3; i++) { this.draw('player'); this.draw('cpu'); }
@@ -500,6 +516,17 @@ const game = {
                 } else {
                     this.log(`💀 【山札切れ】敗北しました。`);
                     this.p_hp = 0; this.checkWinLose(); return;
+                }  
+// 【修正後】
+     } else {
+            // オンライン時は実際のc_deck配列がないため、数値のみを操作
+            if(this.is_online) {
+                if (this.c_deck_len > 0) {
+                    if (this.c_hand_len < 10) this.c_hand_len++;
+                    this.c_deck_len--;
+                } else {
+                    this.log(`💀 【相手山札切れ】勝利しました。`);
+                    this.c_hp = 0; this.checkWinLose(); return;
                 }
             } else {
                 if(this.c_deck.length > 0) {
@@ -511,8 +538,8 @@ const game = {
                 }
             }
         }
+        }
     },
-
     play(idx) {
         if (!this.is_player_turn) return;
         let c = this.p_hand[idx];
@@ -524,6 +551,9 @@ const game = {
         this.p_grave++;
         this.p_selected = [];
         this.updateUI();
+        if(this.is_online){
+            socket.emit('sendAction', { type: 'play', card: c});
+        }
     },
 
     executeEffect(who, c) {
@@ -604,7 +634,7 @@ const game = {
             };
             this.log("💥 不協和音が発生！危険な魔法カードが生成されました。");
         }
-
+ let consumed = this.p_selected.length;
         this.p_selected.sort((a,b)=>b-a).forEach(i => this.p_hand.splice(i, 1));
         if (this.p_hand.length < 10) {
             this.p_hand.push(newCard);
@@ -614,6 +644,10 @@ const game = {
         this.has_synthsized = true;
         this.p_selected = [];
         this.updateUI();
+        if(this.is_online){
+            socket.emit('sendAction',{ type: 'synth', card: newCard, consumed: consumed});
+        }
+
     },
 
     detectChord(notes) {
@@ -776,7 +810,7 @@ const game = {
     }
 };
 // RenderのサーバーURLに書き換えてください
-const socket = io('https://maestro-of-fate.onrender.com/'); 
+const socket = io(); 
 
 // --- オンラインマッチ関連処理 ---
 
@@ -823,7 +857,7 @@ socket.on('matchFound', (data) => {
         }));
 
         // 3. デッキを渡して初期化
-        game.init(pDeck, true); 
+        game.init(pDeck, true, isMyTurn); 
 
         // 4. 戦闘画面を表示（画面切り替え）
         showScreen('screen-battle');
@@ -836,7 +870,9 @@ socket.on('opponentEndTurn', () => {
     game.has_synthsized = false;
     game.p_mana = Math.min(10, game.p_max + 1);
     game.p_max = game.p_mana;
+    game.c_mana = game.p_max;
     game.draw('player'); // ドロー処理
+    game.draw('cpu');
     
     document.getElementById('end-turn-btn').disabled = false;
     document.getElementById('end-turn-btn').innerText = 'ターン終了';
@@ -844,11 +880,30 @@ socket.on('opponentEndTurn', () => {
     game.updateUI();
 });
 
+// 【修正前】
 // 相手がアクションを実行したとき
 socket.on('receiveAction', (action) => {
     // 例: action = { type: 'play', card: {...} } や { type: 'synth', chord: {...} }
     // 相手のアクション内容に応じて自分の画面（相手HPやログ等）を更新する処理
 });
+
+// 【修正後】
+// 相手がアクションを実行したとき
+socket.on('receiveAction', (action) => {
+    if (action.type === 'play') {
+        game.c_mana -= action.card.cost; // マナ消費
+        game.c_hand_len--;               // 手札を1枚減らす
+        game.executeEffect('cpu', action.card); // 効果発動 (cpu = 対戦相手の扱い)
+        game.updateUI();
+    } 
+    else if (action.type === 'synth') {
+        // 消費した枚数から新しく手に入れた1枚を引いた分だけ手札を減らす
+        game.c_hand_len -= (action.consumed - 1); 
+        game.log(`🤖 相手が【${action.card.name}】を合成しました！`);
+        game.updateUI();
+    }
+});
+
 
 // 相手が切断した場合
 socket.on('opponentDisconnected', () => {
