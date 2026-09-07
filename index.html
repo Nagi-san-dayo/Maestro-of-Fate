@@ -115,6 +115,11 @@
             border-color: var(--gold) !important; box-shadow: 0 0 20px rgba(255, 193, 7, 0.9) !important;
             transform: translateY(-10px) !important; background: #4a3e2b;
         }
+                .card.chord-hint {
+            border-color: #ff4d4d !important;
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.8) !important;
+            transform: translateY(-5px);
+        }
         .card .cost { 
             position: absolute; top: 5px; left: 5px; background: #007bff; 
             width: 22px; height: 22px; border-radius: 50%; display: flex; 
@@ -847,25 +852,30 @@ const game = {
         document.getElementById('cpu-deck').innerText = this.c_deck_len;
         document.getElementById('player-grave').innerText = this.p_grave;
         
-        const handDiv = document.getElementById('player-hand');
+                const handDiv = document.getElementById('player-hand');
+        
+        // 追加: 赤く光らせるカードのインデックスを取得
+        let hintIndices = this.getChordHintIndices();
+
         handDiv.innerHTML = this.p_hand.map((c, i) => {
             let canPlay = this.is_player_turn && this.p_mana >= c.cost;
             let isSelected = this.p_selected.includes(i);
+            let isHint = hintIndices.has(i); // 追加: ヒント対象かどうか
             
-                        // 前略...
+            // クラスに chord-hint を追加し、styleの透明度ダウン条件から isHint を除外する
             return `
-            <div class="card ${canPlay ? 'playable' : ''} ${isSelected ? 'selected' : ''}" 
+            <div class="card ${canPlay ? 'playable' : ''} ${isSelected ? 'selected' : ''} ${isHint ? 'chord-hint' : ''}" 
                  onclick="game.toggleSelect(${i})" 
                  ondblclick="game.play(${i})"
-                 style="${!canPlay && !isSelected ? 'opacity:0.5; border-color:#555;' : ''}">
+                 style="${!canPlay && !isSelected && !isHint ? 'opacity:0.5; border-color:#555;' : ''}">
                 <div class="cost">${c.cost}</div>
                 <div class="note">${c.note || '♪'}</div>
                 <div class="name">${c.name}</div>
                 <div class="effect">${(c.desc || '').replace(/ /g, '<br>')}</div>
             </div>
             `;
-
         }).join('');
+
 
         const synthDiv = document.getElementById('synth-area');
         synthDiv.innerHTML = this.p_selected.map(i => `
@@ -886,7 +896,59 @@ const game = {
             this.p_selected.splice(pos, 1);
         }
         this.updateUI();
-    }
+    },
+        getChordHintIndices() {
+        let hintIndices = new Set();
+        let handSize = this.p_hand.length;
+        
+        // 手札から3枚・4枚の全組み合わせのインデックスを取得するヘルパー関数
+        const getCombinations = (k) => {
+            let results = [];
+            const helper = (start, combo) => {
+                if (combo.length === k) {
+                    results.push([...combo]);
+                    return;
+                }
+                for (let i = start; i < handSize; i++) {
+                    combo.push(i);
+                    helper(i + 1, combo);
+                    combo.pop();
+                }
+            };
+            helper(0, []);
+            return results;
+        };
+
+        // 3枚と4枚の組み合わせを統合
+        let combos = [...getCombinations(3), ...getCombinations(4)];
+
+        if (this.p_selected.length === 0) {
+            // 【条件1】合成ゾーンが空の場合：成立する全和音のカードを対象とする
+            for (let combo of combos) {
+                let notes = combo.map(i => this.p_hand[i].note);
+                if (this.detectChord(notes)) {
+                    combo.forEach(i => hintIndices.add(i));
+                }
+            }
+        } else {
+            // 【条件2】合成ゾーンにカードがある場合：選択中のカードを全て含む組み合わせのみ対象とする
+            for (let combo of combos) {
+                let containsAllSelected = this.p_selected.every(selIdx => combo.includes(selIdx));
+                if (containsAllSelected) {
+                    let notes = combo.map(i => this.p_hand[i].note);
+                    if (this.detectChord(notes)) {
+                        combo.forEach(i => {
+                            // 既に選択済みのカードは赤く光らせない（オレンジのままにする）
+                            if (!this.p_selected.includes(i)) { 
+                                hintIndices.add(i);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+        return hintIndices;
+    },
 };
 // RenderのサーバーURLに書き換えてください
 const socket = io('https://maestro-of-fate.onrender.com/'); 
