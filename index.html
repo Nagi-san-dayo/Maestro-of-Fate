@@ -642,7 +642,8 @@ const game = {
         } else {
 // ...以下略...
 
-        this.c_deck = Array(30).fill(0).map(() => ({...CARD_POOL[Math.floor(Math.random()*CARD_POOL.length)], id: Math.random()}));
+        const normalCards = CARD_POOL.filter(c => !c.isChord);
+        this.c_deck = Array(30).fill(0).map(() => ({...normalCards[Math.floor(Math.random()*normalCards.length)], id: Math.random()}));
         this.c_hand_len = 0; this.c_deck_len = 30;
         for(let i=0; i<3; i++) { this.draw('player'); this.draw('cpu'); }
         this.log("⚔️ バトル開始！あなたのターンです。");
@@ -838,6 +839,32 @@ const game = {
       
 
         setTimeout(() => {
+                    // --- ▼ CPUの和音合成思考ルーチンを追加 ---
+            if (this.c_hand.length >= 3) {
+                // 手札から和音カード（isChord）やコストに関係なく、ノートカードの組み合わせを探す
+                let noteCards = this.c_hand.map((c, idx) => ({ ...c, index: idx })).filter(c => !c.isChord && c.note);
+                
+                if (noteCards.length >= 3) {
+                    // 簡単な例として、先頭3枚のノートで和音判定を行う
+                    let selectedNotes = noteCards.slice(0, 3);
+                    let chordData = this.detectChord(selectedNotes.map(c => c.note));
+                    
+                    if (chordData) {
+                        const rootName = NOTES[chordData.root];
+                        const chordCard = CARD_POOL.find(c => c.isChord && c.chordRoot === rootName && c.chordType === chordData.type);
+                        
+                        if (chordCard) {
+                            // 選択した3枚を手札から削除し、和音カードを手札に加える
+                            selectedNotes.sort((a, b) => b.index - a.index).forEach(c => {
+                                this.c_hand = this.c_hand.filter(h => h.id !== c.id);
+                            });
+                            
+                            this.c_hand.push({ ...chordCard, id: Math.random() });
+                            this.log(`🤖 相手（CPU）が【${chordCard.name}】を合成しました！`);
+                        }
+                    }
+                }
+            }
             while(this.c_mana > 0 && this.c_hand.length > 0) {
                 let playable = this.c_hand.filter(c => c.cost <= this.c_mana);
                 if(playable.length === 0) break;
