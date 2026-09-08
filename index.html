@@ -262,9 +262,12 @@
                     </div>
 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 5px;">
-                        <h3 style="margin: 5px 0;">🎹 合成エリア (3〜4枚選択)</h3>
-                        <button class="action-btn" style="width:auto; margin:0; padding: 6px 15px; background:var(--gold); color:black;" onclick="game.synthesize()">和音合成！</button>
-                    </div>
+    <h3 style="margin: 5px 0;">🎹 合成エリア (3〜4枚選択)</h3>
+    <!-- IDを追加し、残り回数表示を組み込む -->
+    <button class="action-btn" id="btn-synth" style="width:auto; margin:0; padding: 6px 15px; background:var(--gold); color:black;" onclick="game.synthesize()">
+        和音合成！(残り <span id="synth-left">1</span> 回)
+    </button>
+</div>
                     <div class="synth-area" id="synth-area"></div>
                 </div>
 
@@ -397,6 +400,9 @@ const CARD_POOL = [
     { name: "【和音】H sus4", note: "H", cost: 0, effects: { "dmg": 9, "heal": 4 }, desc: "相手に9ダメージ｡ 自身のHPを4回復", isChord: true, chordRoot: "H", chordType: "sus4" },
     { name: "【和音】H 7th", note: "H", cost: 0, effects: { "dmg": 15, "draw:": 2 }, desc: "相手に15ダメージ｡ 山札から2枚引く｡", isChord: true, chordRoot: "H", chordType: "7th" },
     { name: "【和音】H 9th", note: "H", cost: 0, effects: { "dmg": 20 }, desc: "相手に20ダメージ", isChord: true, chordRoot: "H", chordType: "9th" },
+    { name: "Accelerando", note: "C", cost: 2, effects: { "add_synth": 1 }, desc: "和音合成回数 +1。" },
+    { name: "Ritardando", note: "D", cost: 3, effects: { "reduce_synth": 1 }, desc: "相手の和音合成回数 -1" },
+    { name: "Fermata", note: "E", cost: 5, effects: { "add_synth": 2, "dmg": 2 }, desc: "相手に2ダメージ｡ 和音合成回数 +2。" },
 ];
 let customDecks = JSON.parse(localStorage.getItem("mof_decks")) || Array(10).fill(null);
 let currentSlot = 0;
@@ -580,23 +586,39 @@ const effectHandlers = {
         if(who === 'player') game.p_hp -= val;
         else game.c_hp -= val;
         game.log(`  └ 反動で自身に ${val} ダメージ！`);
+    },
+        add_synth: (game, who, val) => {
+        if(who === 'player') game.p_synth_left += val;
+        game.log(`  └ 🎵 このターンの和音合成回数が ${val} 回増加！`);
+    },
+    reduce_synth: (game, who, val) => {
+        if(who === 'player') game.c_next_synth_mod -= val;
+        else game.p_next_synth_mod -= val;
+        game.log(`  └ 📉 相手の次のターンの和音合成回数を ${val} 回減少！`);
     }
+    // ▲ ここまで追加 ▲
 };
 // --- バトルシステム ---
 const game = {
     is_online: false,
+    // ▼ p_synth_left, p_next_synth_mod, c_next_synth_mod を追加
     p_hp: 30, c_hp: 30, p_mana: 1, p_max: 1, p_hand: [], p_deck: [],
     c_mana: 1, c_hand: [], c_deck: [], c_hand_len: 0, c_deck_len: 30,
     p_grave: 0, p_selected: [], has_synthsized: false, is_player_turn: true,
+    p_synth_left: 1, p_next_synth_mod: 0, c_next_synth_mod: 0, 
 
-   // 【修正後】
-    init(deck, isOnline = false, isMyTurn = true) { // 引数に isMyTurn を追加
+    init(deck, isOnline = false, isMyTurn = true) {
         this.is_online = isOnline;
         this.p_hp = 30; this.c_hp = 30; this.p_mana = 1; this.p_max = 1; this.c_mana = 1;
         this.p_grave = 0; this.p_hand = []; this.c_hand = []; this.p_selected = [];
         this.has_synthsized = false; 
-        this.is_player_turn = isMyTurn; // ★ サーバーからの指示をセット
-
+        this.is_player_turn = isMyTurn;
+        
+        // ▼ ゲーム開始時に状態をリセット
+        this.p_synth_left = 1;
+        this.p_next_synth_mod = 0;
+        this.c_next_synth_mod = 0;
+        // ... 以降は元のまま
         document.getElementById('log-list').innerHTML = '';
         this.p_deck = deck.sort(() => Math.random() - 0.5);
         
@@ -721,6 +743,7 @@ const game = {
 
     synthesize() {
         if (!this.is_player_turn) return;
+        if(this.p_synth_left <=0) return this.log("⚠️ このターンはもう和音合成できません｡ ");
         if(this.p_selected.length < 3) return this.log("⚠️ 合成には3枚以上選択してください。");
 
         let notes = this.p_selected.map(i => this.p_hand[i].note);
@@ -770,6 +793,7 @@ const game = {
             this.log(`🔥 手札満杯のため生成カードが消滅した！`);
         }
         this.has_synthsized = true;
+        this.p_synth_left--;
         this.p_selected = [];
         this.updateUI();
         if(this.is_online){
@@ -830,6 +854,8 @@ const game = {
                 this.p_mana = this.p_max;
                 this.c_mana = this.p_max;
                 this.has_synthsized = false;
+                this.p_synth_left = Math.max(0, 1 + this.p_next_synth_mod);
+                this.p_next_synth_mod = 0;
         
                 this.draw('player');
                 this.draw('cpu');
@@ -885,6 +911,23 @@ const game = {
                 <div class="name" style="margin-top:12px; font-size:9px;">${this.p_hand[i].name}</div>
             </div>
         `).join('');
+                // ▼ ここから追加：合成ボタンの見た目と残り回数を更新
+        const synthBtn = document.getElementById('btn-synth');
+        if (synthBtn) {
+            document.getElementById('synth-left').innerText = this.p_synth_left;
+            if (this.p_synth_left <= 0 || !this.is_player_turn) {
+                synthBtn.style.background = "#555";
+                synthBtn.style.color = "#aaa";
+                synthBtn.style.boxShadow = "none";
+                synthBtn.style.cursor = "not-allowed";
+            } else {
+                synthBtn.style.background = "var(--gold)";
+                synthBtn.style.color = "black";
+                synthBtn.style.boxShadow = ""; // デフォルトに戻す
+                synthBtn.style.cursor = "pointer";
+            }
+        }
+        // ▲ ここまで追加
     },
 
     toggleSelect(i) {
@@ -1009,6 +1052,8 @@ socket.on('matchFound', (data) => {
 socket.on('opponentEndTurn', () => {
     game.is_player_turn = true;
     game.has_synthsized = false;
+    game.p_synth_left = Math.max(0, 1 + game.p_next_synth_mod);
+    game.p_next_synth_mod = 0;
     game.p_mana = Math.min(10, game.p_max + 1);
     game.p_max = game.p_mana;
     game.c_mana = game.p_max;
